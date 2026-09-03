@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Title from "../components/Title";
@@ -10,7 +10,7 @@ function Collection() {
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [sortType, setSortType] = useState("relevant");
-  const { products } = useShopContext();
+  const { products, showSearch, search } = useShopContext();
 
   const toggleCategory = (e) => {
     if (categories.includes(e.target.value)) {
@@ -29,8 +29,14 @@ function Collection() {
     }
   };
 
-  const applyFilter = () => {
+  const applyFilter = useCallback(() => {
     let productsCopy = products.slice();
+
+    if (showSearch && search) {
+      productsCopy = productsCopy.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase()),
+      );
+    }
 
     if (categories.length > 0) {
       productsCopy = productsCopy.filter((item) =>
@@ -43,9 +49,9 @@ function Collection() {
       );
     }
     setFilterProducts(productsCopy);
-  };
+  }, [products, categories, subCategories, showSearch, search]);
 
-  const sortProduct = () => {
+  const sortProduct = useCallback(() => {
     let filterProductCopy = filterProducts.slice();
     switch (sortType) {
       case "low-high":
@@ -58,11 +64,11 @@ function Collection() {
         applyFilter();
         break;
     }
-  };
+  }, [filterProducts, applyFilter, sortType]);
 
   useEffect(() => {
     applyFilter();
-  }, [categories, subCategories]);
+  }, [categories, subCategories, showSearch, search, applyFilter]);
 
   useEffect(() => {
     sortProduct();

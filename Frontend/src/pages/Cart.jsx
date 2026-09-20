@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { useShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
+import CartTotal from "../components/CartTotal";
 import { assets } from "../assets/assets";
 
 function Cart() {
   const [cartData, setCartData] = useState([]);
-  const { cartItems, products, currency, removeFromCart } = useShopContext();
+  const {
+    cartItems,
+    products,
+    currency,
+    removeFromCart,
+    updateCartItemQuantity,
+    navigate,
+  } = useShopContext();
 
   useEffect(() => {
     const data = [];
@@ -59,6 +67,11 @@ function Cart() {
             </div>
 
             <input
+              onChange={(e) =>
+                e.target.value === "" || e.target.value === "0"
+                  ? ""
+                  : updateCartItemQuantity(item._id, item.size, e.target.value)
+              }
               type="number"
               min={1}
               defaultValue={item.quantity}
@@ -70,9 +83,23 @@ function Cart() {
               src={assets.bin_icon}
               alt="bin"
               onClick={() => removeFromCart(item._id, item.size)}
+              // onClick={() => updateCartItemQuantity(item._id, item.size, 0)}
             />
           </div>
         ))}
+      </div>
+      <div className="flex justify-end mt-20">
+        <div className="w-full sm:w-[450px]">
+          <CartTotal />
+          <div className="w-full text-end">
+            <button
+              className="w-full bg-black text-white py-3 mt-4 hover:bg-gray-800 transition-all uppercase"
+              onClick={() => navigate("/place-order")}
+            >
+              Proceed to Checkout
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

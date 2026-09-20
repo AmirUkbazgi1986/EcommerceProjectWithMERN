@@ -1,0 +1,40 @@
+import Title from "./Title";
+import { useShopContext } from "../context/ShopContext";
+
+function CartTotal() {
+  const { getCartAmount, currency, delivery_fee } = useShopContext();
+  return (
+    <div className="w-full">
+      <div className="text-2xl">
+        <Title text1="cart " text2="totals" />
+      </div>
+      <div className="flex flex-col gap-2 text-sm mt-2">
+        <div className="flex justify-between">
+          <p>Subtotal</p>
+          <p>
+            {currency}
+            {getCartAmount()}.00
+          </p>
+        </div>
+        <hr />
+        <div className="flex justify-between">
+          <p>Delivery Fee</p>
+          <p>
+            {currency}
+            {delivery_fee}.00
+          </p>
+        </div>
+        <hr />
+        <div className="flex justify-between font-semibold text-lg">
+          <p>Total</p>
+          <p>
+            {currency}
+            {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee}.00
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CartTotal;

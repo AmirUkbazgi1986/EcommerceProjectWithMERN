@@ -123,7 +123,7 @@ function PlaceOrder() {
         <div className="flex justify-end">
           <button
             className="w-1/3 bg-black text-white py-3 mt-4 hover:bg-gray-800 transition-all uppercase"
-            onClick={() => navigate("/place-order")}
+            onClick={() => navigate("/orders")}
           >
             place order
           </button>

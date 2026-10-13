@@ -5,6 +5,7 @@ import cors from "cors";
 import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 import userRouter from "./routes/userRoute.js";
+import productRouter from "./routes/productRoute.js";
 
 // App configuration
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json());
 
 //Api endpoints
 app.use("/api/users", userRouter);
+app.use("/api/product", productRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from the backend!");

@@ -25,7 +25,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide product category"],
       enum: {
-        values: ["men", "women", "kids"],
+        values: ["Men", "Women", "Kids"],
         message:
           "{VALUE} is not supported. Please choose from men, women, kids",
       },
@@ -40,13 +40,17 @@ const productSchema = new mongoose.Schema(
       },
     },
     size: {
-      type: String,
+      type: Array,
       required: [true, "Please provide product size"],
-      enum: {
-        values: ["S", "M", "L", "XL", "XXL"],
-        message:
-          "{VALUE} is not supported. Please choose from S, M, L, XL, XXL",
-      },
+
+      // size: {
+      //   type: String,
+      //   required: [true, "Please provide product size"],
+      //   enum: {
+      //     values: ["S", "M", "L", "XL", "XXL"],
+      //     message:
+      //       "{VALUE} is not supported. Please choose from S, M, L, XL, XXL",
+      //   },
     },
     bestSeller: {
       type: Boolean,

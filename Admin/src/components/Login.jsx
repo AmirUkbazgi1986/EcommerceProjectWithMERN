@@ -58,7 +58,6 @@ function Login({ setToken }) {
             />
           </div>
           <button
-            // onClick={() => setToken("login")}
             type="submit"
             className="w-full px-4 py-2 rounded-md bg-gray-950 text-sm text-white "
           >

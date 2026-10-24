@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { assets } from "../assets/assets";
-import { useEffect } from "react";
+import axios from "axios";
+import { backendUrl } from "../Layout/AppLayout";
+import { toast } from "react-toastify";
+// import { useEffect } from "react";
 
 function Add() {
   const [image1, setImage1] = useState(false);
@@ -18,15 +21,97 @@ function Add() {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  const handleSize = (e) => {
+    if (data.size.includes(e.target.innerHTML)) {
+      setData((prev) => ({
+        ...prev,
+        size: prev.size.filter((item) => item !== e.target.innerHTML),
+      }));
+    } else {
+      setData((prev) => ({
+        ...prev,
+        size: [...prev.size, e.target.innerHTML],
+      }));
+    }
+  };
+
+  const handleOnSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const token = localStorage.getItem("token");
+
+      // 1. Create a new form data
+
+      const formData = new FormData();
+
+      formData.append("name", data.name);
+      formData.append("description", data.description);
+      formData.append("price", data.price);
+      formData.append("category", data.category);
+      formData.append("subCategory", data.subCategory);
+
+      // Stringify array so backend can parse it properly
+      formData.append("size", JSON.stringify(data.size));
+
+      formData.append("bestseller", data.bestseller);
+
+      // Only append images if they have actually been selected
+      image1 && formData.append("image1", image1);
+      image2 && formData.append("image2", image2);
+      image3 && formData.append("image3", image3);
+      image4 && formData.append("image4", image4);
+
+      // Debugging loop to check FormData contents safely
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(`${key}:`, value);
+      // }
+
+      const res = await axios.post(`${backendUrl}/api/product/`, formData, {
+        headers: {
+          authorization: `Bearer ${token}`, // Standard Bearer token format
+        },
+      });
+      // console.log(res.data);
+
+      if (res.data.success) {
+        toast.success(res.data.message || "Product added successfully!");
+        setImage1(false);
+        setImage2(false);
+        setImage3(false);
+        setImage4(false);
+        setData({
+          name: "",
+          description: "",
+          price: "",
+          category: "Men",
+          subCategory: "Topwear",
+          bestseller: false,
+          size: [],
+        });
+      } else {
+        toast.error(res.data.message || "Error adding product");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message || "Something went wrong");
+    }
+  };
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
+
   return (
-    <form className="w-full flex flex-col items-start gap-3 ">
+    <form
+      onSubmit={handleOnSubmit}
+      className="w-full flex flex-col items-start gap-3 "
+    >
       <div>
         <p className="mb-2">Upload Image</p>
         <div className="flex gap-2">
@@ -150,34 +235,55 @@ function Add() {
         <p className="mb-2">Product Size</p>
         <div className="w-full flex flex-col gap-2 sm:flex-row sm:gap-6">
           <div>
-            <p className="bg-slate-200 px-3 py-1 cursor-pointer text-center">
+            <p
+              onClick={handleSize}
+              className={`${data.size.includes("S") ? "bg-pink-100" : "bg-slate-200"} px-3 py-1 cursor-pointer text-center`}
+            >
               S
             </p>
           </div>
           <div>
-            <p className="bg-slate-200 px-3 py-1 cursor-pointer text-center">
+            <p
+              onClick={handleSize}
+              className={`${data.size.includes("M") ? "bg-pink-100" : "bg-slate-200"} px-3 py-1 cursor-pointer text-center`}
+            >
               M
             </p>
           </div>
           <div>
-            <p className="bg-slate-200 px-3 py-1 cursor-pointer text-center">
+            <p
+              onClick={handleSize}
+              className={`${data.size.includes("L") ? "bg-pink-100" : "bg-slate-200"} px-3 py-1 cursor-pointer text-center`}
+            >
               L
             </p>
           </div>
           <div>
-            <p className="bg-slate-200 px-3 py-1 cursor-pointer text-center">
+            <p
+              onClick={handleSize}
+              className={`${data.size.includes("XL") ? "bg-pink-100" : "bg-slate-200"} px-3 py-1 cursor-pointer text-center`}
+            >
               XL
             </p>
           </div>
           <div>
-            <p className="bg-slate-200 px-3 py-1 cursor-pointer text-center">
+            <p
+              onClick={handleSize}
+              className={`${data.size.includes("XXL") ? "bg-pink-100" : "bg-slate-200"} px-3 py-1 cursor-pointer text-center`}
+            >
               XXL
             </p>
           </div>
         </div>
       </div>
       <div className="w-full flex gap-2 mt-2 ">
-        <input type="checkbox" id="bestseller" />
+        <input
+          onChange={handleChange}
+          checked={data.bestseller}
+          type="checkbox"
+          name="bestseller"
+          id="bestseller"
+        />
         <label htmlFor="bestseller" className="cursor-pointer">
           Add to bestseller
         </label>

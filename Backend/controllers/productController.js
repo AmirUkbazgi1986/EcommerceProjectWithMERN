@@ -1,6 +1,7 @@
 import Product from "../models/productModel.js";
 import upload from "../middleware/multer.js";
 import cloudinary from "cloudinary";
+
 export const uploadProductImages = upload.fields([
   { name: "image1", maxCount: 1 },
   { name: "image2", maxCount: 1 },
@@ -130,6 +131,7 @@ export const updateProductById = async (req, res) => {
 export const deleteProductById = async (req, res) => {
   try {
     const { id } = req.params;
+    // console.log(req.params);
     const deletedProduct = await Product.findByIdAndDelete(id);
 
     if (!deletedProduct) {

@@ -5,6 +5,7 @@ const adminAuth = async (req, res, next) => {
   try {
     // 1. check if the token is provided in the request headers
     const token = req.headers.authorization?.split(" ")[1]; // Assuming the token is sent as "Bearer <token>"
+    // console.log(token);
     if (!token) {
       return res
         .status(401)
@@ -21,13 +22,13 @@ const adminAuth = async (req, res, next) => {
         .status(403)
         .json({ success: false, message: "Access denied. Admins only." });
     }
+    next();
   } catch (error) {
     console.error("Admin authentication error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 
   // If everything is fine, proceed to the next middleware or route handler
-  next();
 };
 
 export default adminAuth;

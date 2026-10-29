@@ -36,6 +36,7 @@ const loginUser = async (req, res) => {
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+    console.log(name);
 
     // Check if all required fields are provided
     if (!name || !email || !password) {

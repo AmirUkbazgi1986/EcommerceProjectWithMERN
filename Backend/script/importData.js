@@ -44,3 +44,8 @@ const run = async () => {
   }
 };
 run();
+
+/*
+npm run seed -- --import
+npm run seed -- --delete
+*/

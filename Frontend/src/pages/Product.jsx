@@ -14,6 +14,7 @@ function Product() {
 
   const getProductData = useCallback(async () => {
     const product = products.find((item) => item._id === id);
+
     if (product) {
       setProductData(product);
       setImage(product.image[0]);
@@ -23,7 +24,10 @@ function Product() {
   }, [id, products]);
 
   useEffect(() => {
-    getProductData();
+    function loading() {
+      getProductData();
+    }
+    loading();
   }, [getProductData]);
 
   if (!productData) {
@@ -75,7 +79,7 @@ function Product() {
           <div className="flex flex-col gap-4 my-8">
             <p>Select Size</p>
             <div className="flex gap-2">
-              {productData.sizes.map((size, index) => (
+              {productData.size?.map((size, index) => (
                 <button
                   className={`border py-2 px-4 bg-gray-100 ${selectedSize === size ? "border-orange-500" : "border-gray-300"}`}
                   key={index}

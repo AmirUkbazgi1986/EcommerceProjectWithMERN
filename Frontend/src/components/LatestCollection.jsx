@@ -8,7 +8,10 @@ function LatestCollection() {
   const { products } = useShopContext();
 
   useEffect(() => {
-    setLatestProducts(products.slice(0, 10));
+    function loading() {
+      setLatestProducts(products.slice(0, 10));
+    }
+    loading();
   }, [products]);
   return (
     <div className="my-10">

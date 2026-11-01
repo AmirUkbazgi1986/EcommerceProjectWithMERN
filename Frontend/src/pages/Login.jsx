@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useShopContext } from "../context/ShopContext";
 
 import axios from "axios";
 import { toast } from "react-toastify";
 
 function Login() {
-  const [currentState, setCurrentState] = useState("Sign Up");
+  const [currentState, setCurrentState] = useState("Login");
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -21,33 +21,54 @@ function Login() {
   const onSubmitHandler = async (e) => {
     try {
       e.preventDefault();
+      // There is nothing inherently wrong with this, but for registration and login, you don't need FormData.You can simply send a JavaScript object:
 
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("email", data.email);
-      formData.append("password", data.password);
+      // const formData = new FormData();
+      // formData.append("name", data.name);
+      // formData.append("email", data.email);
+      // formData.append("password", data.password);
       // console.log(formData);
+
       // for (let [key, value] of formData.entries()) {
       //   console.log(`${key}: ${value}`);
+      // }
+      // console.log("Backend URL:", backendUrl);
+      // console.log("Request URL:", `${backendUrl}/api/users/register`);
+
       if (currentState === "Sign Up") {
-        const res = await axios.post(
-          `${backendUrl}/api/users/register`,
-          formData,
-        );
+        const res = await axios.post(`${backendUrl}/api/users/register`, data);
+
         if (res.data.success) {
-          console.log(res.data.token);
+          // console.log(res.data.token);
+          setToken(res.data.token);
+          localStorage.setItem("token", res.data.token);
           toast.success(res.data.message);
         } else {
-          toast.error(`Error; ${res.data.message}`);
+          toast.error(`Error: ${res.data.message}`);
         }
       } else {
-        const res = await axios.post(`${backendUrl}/api/users/login`, formData);
-        console.log(res.data.token);
+        const res = await axios.post(`${backendUrl}/api/users/login`, {
+          email: data.email,
+          password: data.password,
+        });
+        if (res.data.success) {
+          setToken(res.data.token);
+          localStorage.setItem("token", res.data.token);
+        } else {
+          toast.error(`Error: ${res.data.message}`);
+        }
       }
     } catch (error) {
       console.log(error);
+      toast.error("Error");
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate("/");
+    }
+  }, [token, navigate]);
 
   return (
     <form

@@ -16,23 +16,29 @@ function Cart() {
   } = useShopContext();
 
   useEffect(() => {
-    const data = [];
-    for (const items in cartItems) {
-      for (const item in cartItems[items]) {
-        if (cartItems[items][item] > 0) {
-          data.push({
-            _id: items,
-            size: item,
-            quantity: cartItems[items][item],
-            product: products.find((product) => product._id === items),
-          });
+    if (products.length > 0) {
+      const data = [];
+      for (const items in cartItems) {
+        for (const item in cartItems[items]) {
+          if (cartItems[items][item] > 0) {
+            data.push({
+              _id: items,
+              size: item,
+              quantity: cartItems[items][item],
+              product: products.find((product) => product._id === items),
+            });
+          }
         }
       }
-    }
 
-    setCartData(data);
+      setCartData(data);
+    }
   }, [cartItems, products]);
 
+  useEffect(() => {
+    console.log("cartData", cartData);
+    console.log("cartItems", cartItems);
+  }, [cartData]);
   return (
     <div className="border-t pt-14">
       <div className="text-2xl mb-3">

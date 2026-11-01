@@ -25,7 +25,6 @@ const ShopContextProvider = ({ children }) => {
   //   }
   // }
   const navigate = useNavigate();
-
   const currency = "$";
   const delivery_fee = 10;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -44,14 +43,7 @@ const ShopContextProvider = ({ children }) => {
     }
   }, [backendUrl]);
 
-  useEffect(() => {
-    async function loading() {
-      await fetchProducts();
-    }
-    loading();
-  }, [fetchProducts]);
-
-  const addToCart = (itemId, size) => {
+  const addToCart = async (itemId, size) => {
     let cartData = structuredClone(cartItems);
     // Check if the item already exists in the cart
     if (cartData[itemId]) {
@@ -66,6 +58,31 @@ const ShopContextProvider = ({ children }) => {
       cartData[itemId][size] = 1;
     }
     setCartItems(cartData);
+    // console.log(itemId, size, cartData);
+    console.log("backendUrl", backendUrl);
+    // Send the updated cart data to the backend
+    if (token) {
+      try {
+        const res = await axios.post(
+          `${backendUrl}/api/cart/add`,
+          { itemId, size },
+          {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (res.data.success) {
+          toast.success(res.data.message || "Added to cart");
+        } else {
+          toast.error(res.data.message || "Error adding to cart");
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Error adding to cart");
+      }
+    }
   };
 
   const removeFromCart = (itemId, size) => {
@@ -103,13 +120,64 @@ const ShopContextProvider = ({ children }) => {
     return totalItems;
   };
 
-  const updateCartItemQuantity = (itemId, size, quantity) => {
+  const updateCartItemQuantity = async (itemId, size, quantity) => {
     let cartData = structuredClone(cartItems);
+    // 1. updating the cart in the frontend
     cartData[itemId][size] = quantity;
-
     setCartItems(cartData);
+    // console.log("cartData", cartData);
+    //   2. updating the cart in the backend
+    if (token) {
+      try {
+        const res = await axios.patch(
+          `${backendUrl}/api/cart/${itemId}`,
+          { itemId, size, quantity },
+          {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        // console.log("res", res.data);
+        if (res.data.success) {
+          toast.success(res.data.message || "Cart updated");
+        } else {
+          toast.error(res.data.message || "Error updating cart");
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message || "Error updating cart");
+      }
+    }
   };
 
+  const getUserCart = useCallback(
+    async (token) => {
+      if (token) {
+        try {
+          const res = await axios.get(
+            `${backendUrl}/api/cart/get`,
+
+            {
+              headers: {
+                authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          // console.log("res", res.data);
+          if (res.data.success) {
+            setCartItems(res.data.cartData);
+          } else {
+            toast.error(res.data.message || "Error fetching cart");
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error.message || "Error fetching cart");
+        }
+      }
+    },
+    [token, backendUrl],
+  );
   const getCartAmount = () => {
     let totalAmount = 0;
     for (const itemId in cartItems) {
@@ -123,6 +191,19 @@ const ShopContextProvider = ({ children }) => {
     return totalAmount;
   };
 
+  useEffect(() => {
+    async function loading() {
+      await fetchProducts();
+    }
+    loading();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    if (!token && localStorage.getItem("token")) {
+      setToken(localStorage.getItem("token"));
+      getUserCart(localStorage.getItem("token"));
+    }
+  }, [token, getUserCart]);
   // useEffect(() => {
   //   console.log(cartItems);
   //   // localStorage.setItem("cart", JSON.stringify(cartItems));
@@ -137,6 +218,7 @@ const ShopContextProvider = ({ children }) => {
     showSearch,
     setShowSearch,
     cartItems,
+    setCartItems,
     addToCart,
     getTotalCartItems,
     removeFromCart,
@@ -145,6 +227,7 @@ const ShopContextProvider = ({ children }) => {
     navigate,
     token,
     setToken,
+    backendUrl,
   };
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 };

@@ -3,8 +3,10 @@ import User from "../models/userModel.js";
 // add products to user cart
 const addToCart = async (req, res) => {
   try {
-    const { userId, itemId, size } = req.body;
-    // console.log("userId", userId, "itemId", itemId, "size", size);
+    const { userId } = req;
+    const { itemId, size } = req.body;
+
+    console.log("userId", userId, "itemId", itemId, "size", size);
     // 1. find the user
     const userData = await User.findById(userId);
 
@@ -35,7 +37,8 @@ const addToCart = async (req, res) => {
 // update  user cart
 const updateCart = async (req, res) => {
   try {
-    const { userId, itemId, size, quantity } = req.body;
+    const { userId } = req;
+    const { itemId, size, quantity } = req.body;
     // 1. find the user
     const userData = await User.findById(userId);
 
@@ -58,15 +61,17 @@ const updateCart = async (req, res) => {
 // get  user cart
 const getCart = async (req, res) => {
   try {
-    console.log("req.body", req.userId);
-    const { userId } = req.body;
-    console.log("userId", userId);
+    // console.log("req.body", req.userId);
+    const { userId } = req;
+    // console.log("userId", userId);
 
     // 1. find the user
     const userData = await User.findById(userId);
+    // console.log("userData", userData);
 
     // 2. Then store the cart data in a variable
     let cartData = await userData.cartData;
+    // console.log("cartData", cartData);
 
     res.json({
       success: true,

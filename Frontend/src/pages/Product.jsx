@@ -24,8 +24,8 @@ function Product() {
   }, [id, products]);
 
   useEffect(() => {
-    function loading() {
-      getProductData();
+    async function loading() {
+      await getProductData();
     }
     loading();
   }, [getProductData]);

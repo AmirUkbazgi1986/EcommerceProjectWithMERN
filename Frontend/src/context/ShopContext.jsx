@@ -59,7 +59,7 @@ const ShopContextProvider = ({ children }) => {
     }
     setCartItems(cartData);
     // console.log(itemId, size, cartData);
-    console.log("backendUrl", backendUrl);
+    // console.log("backendUrl", backendUrl);
     // Send the updated cart data to the backend
     if (token) {
       try {
@@ -72,6 +72,7 @@ const ShopContextProvider = ({ children }) => {
             },
           },
         );
+        console.log("res", res.data);
 
         if (res.data.success) {
           toast.success(res.data.message || "Added to cart");

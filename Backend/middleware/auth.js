@@ -12,11 +12,11 @@ const authUser = async (req, res, next) => {
     }
 
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("token_decode", token_decode);
+    // console.log("token_decode", token_decode);
 
     req.userId = token_decode.id;
-    console.log("req.body.userId", req.userId);
-    // next();
+    // console.log("req.body.userId", req.userId);
+    next();
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });

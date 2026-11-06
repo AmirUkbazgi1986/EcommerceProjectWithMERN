@@ -6,12 +6,12 @@ const addToCart = async (req, res) => {
     const { userId } = req;
     const { itemId, size } = req.body;
 
-    console.log("userId", userId, "itemId", itemId, "size", size);
+    // console.log("userId", userId, "itemId", itemId, "size", size);
     // 1. find the user
     const userData = await User.findById(userId);
 
     // 2. Then store the cart data in a variable
-    let cartData = await userData.cartData;
+    let cartData = userData.cartData;
 
     // 3. check if cart data is avaliable with the item Id.
     if (cartData[itemId]) {
@@ -41,9 +41,15 @@ const updateCart = async (req, res) => {
     const { itemId, size, quantity } = req.body;
     // 1. find the user
     const userData = await User.findById(userId);
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     // 2. Then store the cart data in a variable
-    let cartData = await userData.cartData;
+    let cartData = userData.cartData;
 
     // 3. update the cart
     cartData[itemId][size] = Number(quantity);
@@ -58,6 +64,7 @@ const updateCart = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+
 // get  user cart
 const getCart = async (req, res) => {
   try {
@@ -70,7 +77,7 @@ const getCart = async (req, res) => {
     // console.log("userData", userData);
 
     // 2. Then store the cart data in a variable
-    let cartData = await userData.cartData;
+    let cartData = userData.cartData;
     // console.log("cartData", cartData);
 
     res.json({
@@ -84,4 +91,54 @@ const getCart = async (req, res) => {
   }
 };
 
-export { addToCart, updateCart, getCart };
+const deleteCartItem = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { itemId, size } = req.params;
+    // console.log("userId", userId, "itemId", itemId, "size", size);
+
+    // 1. find the user
+    const userData = await User.findById(userId);
+
+    // 2. Then store the cart data in a variable
+    let cartData = userData.cartData;
+
+    // 3. delete the item from the cart
+    if (cartData[itemId] && cartData[itemId][size]) {
+      delete cartData[itemId][size];
+
+      // If there are no more sizes for this item, remove the item entirely
+      if (Object.keys(cartData[itemId]).length === 0) {
+        delete cartData[itemId];
+      }
+    }
+
+    // 4. save to the data base
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { cartData },
+      { returnDocument: "after" },
+    );
+
+    // 5. send response
+    res.json({
+      success: true,
+      message: "Item removed from cart",
+      cartData: updatedUser.cartData,
+    });
+
+    /*
+    1.Frontend sends the DELETE request.
+    2.Backend retrieves the user's cart.
+    3.Backend deletes the selected product size.
+    4.Backend updates MongoDB.
+    5.Backend returns the updated cart.
+    6.Frontend updates its state with the returned cart.
+    */
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { addToCart, updateCart, getCart, deleteCartItem };

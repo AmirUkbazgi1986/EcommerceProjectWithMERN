@@ -86,7 +86,7 @@ const ShopContextProvider = ({ children }) => {
     }
   };
 
-  const removeFromCart = (itemId, size) => {
+  const removeFromCart = async (itemId, size) => {
     let cartData = structuredClone(cartItems);
 
     delete cartData[itemId][size];
@@ -96,6 +96,32 @@ const ShopContextProvider = ({ children }) => {
     }
 
     setCartItems(cartData);
+    console.log(itemId, size, cartData);
+
+    if (token) {
+      try {
+        const res = await axios.delete(
+          `${backendUrl}/api/cart/${itemId}/${size}`,
+          {
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (res.data.success) {
+          setCartItems(res.data.cartData);
+          // console.log("Updated cart from backend:", res.data.cartData);
+          toast.success(res.data.message || "Item removed from cart");
+        } else {
+          toast.error(res.data.message || "Error removing item from cart");
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error("Error removing item from cart");
+        setCartItems(cartData); // Revert to previous state if there's an error, This way, if the database operation fails, the frontend returns to its previous state.
+      }
+    }
   };
   // const removeFromCart = (itemId, size) => {
   //   let cartData = structuredClone(cartItems);

@@ -3,6 +3,7 @@ import {
   addToCart,
   getCart,
   updateCart,
+  deleteCartItem,
 } from "../controllers/cartController.js";
 import authUser from "../middleware/auth.js";
 
@@ -16,5 +17,8 @@ cartRouter.patch("/:itemId", authUser, updateCart);
 
 // get all cart items route
 cartRouter.get("/get", authUser, getCart);
+
+// delete cart item route
+cartRouter.delete("/:itemId/:size", authUser, deleteCartItem);
 
 export default cartRouter;

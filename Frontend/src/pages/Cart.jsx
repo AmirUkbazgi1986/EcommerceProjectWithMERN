@@ -35,10 +35,10 @@ function Cart() {
     }
   }, [cartItems, products]);
 
-  useEffect(() => {
-    console.log("cartData", cartData);
-    console.log("cartItems", cartItems);
-  }, [cartData]);
+  // useEffect(() => {
+  //   console.log("cartData", cartData);
+  //   console.log("cartItems", cartItems);
+  // }, [cartData]);
   return (
     <div className="border-t pt-14">
       <div className="text-2xl mb-3">

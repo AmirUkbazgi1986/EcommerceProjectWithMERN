@@ -38,6 +38,41 @@ function PlaceOrder() {
     }));
   };
 
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Order Payment",
+      description: "Order Payment",
+      order_id: order.id,
+      receipt: order.receipt,
+      handler: async (response) => {
+        // console.log(response);
+        try {
+          const res = await axios.post(
+            `${backendUrl}/api/order/verifyRazorpay`,
+            response,
+            {
+              headers: {
+                authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          if (res.data.success) {
+            navigate("/order");
+            setCartItems({});
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error);
+        }
+      },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -81,11 +116,13 @@ function PlaceOrder() {
               },
             },
           );
-          console.log(res.data);
+          // console.log(res.data);
           if (res.data.success) {
             toast.success("Order placed successfully");
             setCartItems({});
-            navigate("/orders");
+            const { session_url } = res.data;
+
+            window.location.replace(session_url);
           } else {
             toast.error("Failed to place order: " + res.data.message);
           }
@@ -106,9 +143,7 @@ function PlaceOrder() {
           );
           console.log(res.data);
           if (res.data.success) {
-            toast.success("Order placed successfully");
-            setCartItems({});
-            navigate("/orders");
+            initPay(res.data.order);
           } else {
             toast.error("Failed to place order: " + res.data.message);
           }

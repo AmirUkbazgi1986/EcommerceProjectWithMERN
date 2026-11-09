@@ -32,6 +32,35 @@ function Order() {
     }
   }, []);
 
+  const updateOrderStatus = async (e, orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("No token found. Please log in.");
+        return;
+      }
+
+      const res = await axios.patch(
+        `${backendUrl}/api/order/${orderId}/status`,
+        { status: e.target.value },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (res.data.success) {
+        toast.success("Order status updated successfully.");
+        await fetchOrders(); // Refresh the orders after updating
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
   useEffect(() => {
     async function loading() {
       await fetchOrders();
@@ -100,7 +129,11 @@ function Order() {
               <p className="text-sm sm:text-[15px]">
                 {currency} {order.totalAmount}
               </p>
-              <select className="p-2 font-semibold">
+              <select
+                value={order.status}
+                onChange={(e) => updateOrderStatus(e, order._id)}
+                className="p-2 font-semibold"
+              >
                 <option value="Order Placed">Order Placed</option>
                 <option value="Packing">Packing</option>
                 <option value="Shipping">Shipping</option>

@@ -7,6 +7,8 @@ import {
   getUserOrders,
   updateOrderStatus,
   getUserOrderData,
+  verifyOrder,
+  verifyOrderRazorpay,
 } from "../controllers/orderController.js";
 import authUser from "../middleware/auth.js";
 import adminAuth from "../middleware/adminAuth.js";
@@ -36,6 +38,10 @@ orderRouter.get("/userorders", authUser, getUserOrders);
 
 // Get user order data for frontend
 orderRouter.get("/user/data", authUser, getUserOrderData);
+
+// verify payment
+orderRouter.post("/verifyStripe", authUser, verifyOrder);
+orderRouter.post("/verifyRazorpay", authUser, verifyOrderRazorpay);
 
 export default orderRouter;
 

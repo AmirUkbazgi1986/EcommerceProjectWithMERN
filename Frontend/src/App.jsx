@@ -9,6 +9,7 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Orders from "./pages/Orders";
 import PlaceOrder from "./pages/PlaceOrder";
+import Verify from "./pages/Verify";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login /> },
       { path: "/orders", element: <Orders /> },
       { path: "/place-order", element: <PlaceOrder /> },
+      { path: "/verify", element: <Verify /> },
 
       { path: "*", element: <div>404 Not Found</div> },
     ],

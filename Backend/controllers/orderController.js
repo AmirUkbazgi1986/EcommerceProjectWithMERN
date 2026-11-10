@@ -43,7 +43,7 @@ const placeOrder = async (req, res) => {
 const placeOrderStripe = async (req, res) => {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    console.log(stripe);
+    // console.log(stripe);
     const { userId } = req;
     const { items, amount, address, paymentMethod } = req.body;
     const { origin } = req.headers;
@@ -166,7 +166,7 @@ const getUserOrders = async (req, res) => {
   try {
     const { userId } = req;
     const orders = await Order.find({ userId }).sort({ date: -1 });
-    console.log("orders", orders);
+    // console.log("orders", orders);
     res.json({ success: true, orders });
   } catch (error) {
     console.log(error);
@@ -246,6 +246,7 @@ const verifyOrderRazorpay = async (req, res) => {
     const { userId } = req;
     const { razorpay_order_id } = req.body;
     const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+    console.log(`orderInfo: ${orderInfo}`);
     if (orderInfo.status === "paid") {
       await Order.findByIdAndUpdate(orderInfo.receipt, { payment: true });
       await User.findByIdAndUpdate(userId, { cartData: {} });

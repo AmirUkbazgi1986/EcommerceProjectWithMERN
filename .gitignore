@@ -1,2 +1,4 @@
 # Environment variables
 Backend/config.env
+node_modules
+*.env

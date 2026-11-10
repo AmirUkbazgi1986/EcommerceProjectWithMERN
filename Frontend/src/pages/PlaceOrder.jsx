@@ -39,6 +39,7 @@ function PlaceOrder() {
   };
 
   const initPay = (order) => {
+    // console.log(order);
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
@@ -48,10 +49,10 @@ function PlaceOrder() {
       order_id: order.id,
       receipt: order.receipt,
       handler: async (response) => {
-        // console.log(response);
+        console.log(response);
         try {
           const res = await axios.post(
-            `${backendUrl}/api/order/verifyRazorpay`,
+            `${backendUrl}/api/order/verifyOrderRazorpay`,
             response,
             {
               headers: {
@@ -60,6 +61,7 @@ function PlaceOrder() {
             },
           );
           if (res.data.success) {
+            console.log(res.data.success);
             navigate("/order");
             setCartItems({});
           }
